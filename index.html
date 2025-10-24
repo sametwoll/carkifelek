@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Çarkıfelek - Samet Edition</title>
+    <style>
+        :root {
+            --bg1: #2b2f22;
+            --bg2: #10120f88;
+            --card: #1f2418;
+            --accent: #c9b07a;
+            --accent-2: #8b9975;
+            --muted: #bdb9a8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --good: #dbe8cf;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg1);
+            color: var(--good);
+        }
+
+        body {
+            background-image:
+                linear-gradient(180deg, rgba(16, 18, 15, 0.45), rgba(8, 9, 7, 0.6)),
+                url('./indir.png');
+            /* Arka plan görselini değiştirebilirsin */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 128px;
+            box-sizing: border-box;
+        }
+
+        .app {
+            width: 1100px;
+            max-width: 98%;
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            /* DÜZENLEME BURADA */
+            gap: 20px;
+            align-items: start;
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 8px 30px rgba(2, 6, 2, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .wheel-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.45);
+            transition: transform 4s cubic-bezier(.08, .8, .2, 1);
+            background:
+                conic-gradient(#7a6b45 0deg 30deg, #8b9975 30deg 60deg, #bfae7b 60deg 90deg, #6a7b53 90deg 120deg, #bba56c 120deg 150deg, #8b9975 150deg 180deg, #7a6b45 180deg 210deg, #bfae7b 210deg 240deg, #6a7b53 240deg 270deg, #c9b07a 270deg 300deg, #8b9975 300deg 330deg, #7a6b45 330deg 360deg);
+        }
+
+        .wheel::after {
+            content: '';
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #11130d, #0b0d09);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+            z-index: 3;
+        }
+
+        .needle {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-bottom: 36px solid #8b2b2b;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+            z-index: 10;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card {
+            padding: 12px;
+            border-radius: 10px;
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .h1 {
+            font-size: 18px;
+            margin: 0 0 8px 0;
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: var(--glass);
+            color: var(--good);
+            box-sizing: border-box;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            background: linear-gradient(180deg, var(--accent), #d0b26f);
+            border: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #13210a;
+        }
+
+        button.ghost {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--accent);
+        }
+
+        .players {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.01));
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .player .name {
+            font-weight: 800;
+            color: var(--good)
+        }
+
+        .player .score {
+            font-weight: 900;
+            color: var(--accent)
+        }
+
+        .board {
+            margin-top: 12px;
+            padding: 16px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(10, 12, 8, 0.25), rgba(255, 255, 255, 0.01));
+            font-size: 28px;
+            letter-spacing: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            min-height: 96px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .letter {
+            min-width: 42px;
+            height: 56px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.035);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 24px;
+            padding: 6px 8px;
+            box-shadow: inset 0 -6px 18px rgba(0, 0, 0, 0.15);
+            color: var(--good);
+        }
+
+        .keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .key {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            min-width: 40px;
+            text-align: center;
+            font-weight: 800;
+            color: var(--good);
+        }
+
+        .key:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .bigspin {
+            padding: 12px 18px;
+            font-size: 16px;
+            background: linear-gradient(180deg, #556b3a, #375127);
+            color: #eaf6e6;
+            border-radius: 10px;
+        }
+
+        .controls .small {
+            font-size: 13px;
+            padding: 8px 10px
+        }
+
+        footer {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 12px;
+            text-align: center
+        }
+
+        .sector-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .sector-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-origin: 0 0;
+        }
+
+        .sector-text span {
+            display: inline-block;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111;
+            font-size: 13px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+        }
+
+
+        @media(max-width:980px) {
+            .app {
+                grid-template-columns: 1fr;
+                align-items: stretch
+            }
+
+            .wheel {
+                width: 320px;
+                height: 320px
+            }
+
+            .board {
+                font-size: 22px;
+                min-height: 84px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="panel">
+            <div class="h1">Çark & Oyun Ekranı</div>
+            <div class="wheel-wrap">
+                <div class="needle" id="needle"></div>
+                <div class="wheel" id="wheel" role="img" aria-label="Çark">
+                    <div class="sector-overlay" id="sectorOverlay"></div>
+                </div>
+                <div class="center">
+                    <button id="spinBtn" class="bigspin">Çarkı Çevir</button>
+                    <button id="guessBtn" class="ghost">Tahmin Et</button>
+                </div>
+                <div class="card" style="width:100%;margin-top:8px">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div style="font-weight:800">Sıradaki: <span id="currentPlayer">—</span></div>
+                        <div style="font-weight:800">Tur Puanı: <span id="roundScore">0</span> </div>
+                    </div>
+                    <div class="board" id="board"></div>
+                    <div class="status" id="hint">Moderatör kelime girsin, sonra oyuncular oynasın.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="card">
+                <div class="h1">Moderatör Paneli</div>
+                <label>Kelime / Cümle (gizli)</label>
+                <input type="text" id="masterPhrase" placeholder="TÜRKÇE KARAKTERLERLE YAZIN" />
+                <div style="display:flex;gap:8px;margin-top:8px">
+                    <button id="setPhrase">Kelimeyi Kaydet</button>
+                    <button id="resetBtn" class="ghost">Sıfırla</button>
+                </div>
+                <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+                <label>Yarışmacıları ekle (virgülle ayır)</label>
+                <input type="text" id="playersInput" placeholder="Samet,Berat,Adem" />
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button id="addPlayers">Ekle</button>
+                    <button id="clearPlayers" class="ghost">Temizle</button>
+                </div>
+                <div class="players" id="playersList" style="margin-top:12px"></div>
+            </div>
+
+            <div class="card">
+                <div class="h1">Harf Seç / Oyun Kontrolleri</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button id="buyVowel" class="small">Ünlü Satın Al (200)</button>
+                    <button id="nextTurn" class="small ghost">Sıradaki</button>
+                    <button id="endRound" class="small ghost">Tur Bitir</button>
+                </div>
+                <div style="margin-top:12px">
+                    <label>Harf Tuşları</label>
+                    <div class="keyboard" id="keyboard"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="h1">Skor Tablosu</div>
+                <div id="scoreBoard"></div>
+            </div>
+
+            <footer>Sametwoll hepinize iyi oyunlar diler!</footer>
+        </div>
+    </div>
+
+    <script>
+        const sectors = [
+            { label: "500", value: 500 }, { label: "PAS", value: "PASS" }, { label: "200", value: 200 },
+            { label: "800", value: 800 }, { label: "300", value: 300 }, { label: "İFLAS", value: "BANKRUPT" },
+            { label: "1000", value: 1000 }, { label: "100", value: 100 }, { label: "600", value: 600 },
+            { label: "400", value: 400 }, { label: "700", value: 700 }, { label: "900", value: 900 }
+        ];
+        let players = []; let currentIndex = 0; let phrase = ""; let spinLocked = false; let lastSpinValue = null;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function tone(f, t = 0.1, type = 'sine', g = 0.06) { const o = audioCtx.createOscillator(); const gg = audioCtx.createGain(); o.type = type; o.frequency.value = f; gg.gain.value = g; o.connect(gg); gg.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + t); }
+        function spinSound() { for (let i = 0; i < 6; i++) setTimeout(() => tone(220 + i * 70, 0.06, 'sawtooth', 0.03), i * 60); }
+        function ding() { tone(880, 0.12, 'sine', 0.08) } function wrong() { tone(160, 0.18, 'sawtooth', 0.1) } function bankruptSound() { tone(120, 0.38, 'sawtooth', 0.12); setTimeout(() => wrong(), 140) }
+        const wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spinBtn'), guessBtn = document.getElementById('guessBtn'), currentPlayerEl = document.getElementById('currentPlayer'), roundScoreEl = document.getElementById('roundScore'), boardEl = document.getElementById('board'), playersList = document.getElementById('playersList'), scoreBoard = document.getElementById('scoreBoard'), keyboardEl = document.getElementById('keyboard'), hintEl = document.getElementById('hint');
+        const masterPhraseInput = document.getElementById('masterPhrase'), setPhraseBtn = document.getElementById('setPhrase'), resetBtn = document.getElementById('resetBtn');
+        const playersInput = document.getElementById('playersInput'), addPlayersBtn = document.getElementById('addPlayers'), clearPlayersBtn = document.getElementById('clearPlayers');
+        const buyVowelBtn = document.getElementById('buyVowel'), nextTurnBtn = document.getElementById('nextTurn'), endRoundBtn = document.getElementById('endRound');
+        function randomSpin() { const sectorsCount = sectors.length; const sectorAngle = 360 / sectorsCount; const targetIndex = Math.floor(Math.random() * sectorsCount); const full = Math.floor(Math.random() * 3) + 4; const offset = (targetIndex + 0.5) * sectorAngle; const finalDeg = full * 360 - offset + (Math.random() * (sectorAngle - 6) - (sectorAngle / 2 - 3)); return { deg: finalDeg, index: targetIndex }; }
+        function setWheelRotation(deg, duration = 4000) { wheel.style.transition = `transform ${duration / 1000}s cubic-bezier(.08,.8,.2,1)`; wheel.style.transform = `rotate(${deg}deg)`; }
+        function normalizePhrase(s) { return s.toUpperCase().trim().replace(/ /g, ' '); }
+        function isLetterChar(ch) { return /[A-ZÇĞİÖŞÜ]/.test(ch); }
+        function makeKeyboard() { keyboardEl.innerHTML = ''; const TURK_ALPHA = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ".split(''); TURK_ALPHA.forEach(l => { const b = document.createElement('button'); b.className = 'key'; b.textContent = l; b.onclick = () => onLetterClick(l); keyboardEl.appendChild(b); }); }
+
+        function renderPlayers() {
+            playersList.innerHTML = ''; scoreBoard.innerHTML = '';
+            players.forEach((p, idx) => { const div = document.createElement('div'); div.className = 'player'; div.innerHTML = `<div><div class="name">${p.name}</div><div style="font-size:12px;color:var(--muted)">Tur Puanı: ${p.roundScore} • Toplam: ${p.totalScore}</div></div><div class="score">${p.totalScore}</div>`; if (idx === currentIndex) div.style.boxShadow = '0 0 0 2px rgba(201,176,122,0.2)'; playersList.appendChild(div); const row = document.createElement('div'); row.style.display = 'flex'; row.style.justifyContent = 'space-between'; row.style.padding = '6px 0'; row.innerHTML = `<div style="font-weight:700">${p.name}</div><div>${p.totalScore}</div>`; scoreBoard.appendChild(row); });
+            currentPlayerEl.textContent = players.length ? players[currentIndex].name : '—';
+            roundScoreEl.textContent = players.length ? players[currentIndex].roundScore : '0';
+        }
+        addPlayersBtn.onclick = () => { const text = playersInput.value.trim(); if (!text) return; const arr = text.split(',').map(s => s.trim()).filter(s => s); arr.forEach(name => players.push({ name, totalScore: 0, roundScore: 0 })); playersInput.value = ''; renderPlayers(); if (players.length > 0 && !phrase) hintEl.textContent = 'Oyuncular hazır. Moderatör kelimeyi girsin.'; }
+        clearPlayersBtn.onclick = () => { players = []; currentIndex = 0; renderPlayers(); }
+        setPhraseBtn.onclick = () => { const val = masterPhraseInput.value.trim(); if (!val) { alert('Bir kelime ya da cümle gir.'); return; } phrase = normalizePhrase(val); window.phraseChars = phrase.split(''); window.letterPositions = []; for (let i = 0; i < phrase.length; i++) if (isLetterChar(phrase[i])) window.letterPositions.push(i); window.revealedPerPos = Array(phrase.length).fill(false); boardEl.innerHTML = ''; for (let i = 0; i < phrase.length; i++) { const ch = phrase[i]; const span = document.createElement('div'); if (isLetterChar(ch)) { span.className = 'letter'; span.textContent = ''; } else { span.style.background = 'transparent'; span.style.border = 'none'; span.style.minWidth = 'auto'; span.textContent = ch; } boardEl.appendChild(span); } hintEl.textContent = 'Kelime hazır. Oynayın!'; players.forEach(p => p.roundScore = 0); renderPlayers(); makeKeyboard(); }
+        resetBtn.onclick = () => { if (!confirm('Tüm ilerleme sıfırlanacak, emin misin?')) return; players.forEach(p => { p.totalScore = 0; p.roundScore = 0 }); phrase = ''; masterPhraseInput.value = ''; playersInput.value = ''; players = []; currentIndex = 0; buildEmptyBoardPlaceHolder(); renderPlayers(); hintEl.textContent = 'Oyun sıfırlandı.'; }
+
+        function onLetterClick(letter) {
+            if (!spinLocked && !window.vowelBought) { alert('Önce çarkı çevir.'); return; }
+            const vowels = ['A', 'E', 'I', 'İ', 'O', 'Ö', 'U', 'Ü']; const isVowel = vowels.includes(letter);
+            if (isVowel && !window.vowelBought) { alert('Ünlü harf söylemek için satın almalısın.'); return; }
+            let occurrences = 0;
+            for (let i = 0; i < phrase.length; i++) {
+                if (phrase[i] === letter && !window.revealedPerPos[i]) {
+                    window.revealedPerPos[i] = true; occurrences++; boardEl.children[i].textContent = letter;
+                }
+            }
+            if (occurrences > 0) {
+                ding();
+                if (window.vowelBought) {
+                    hintEl.textContent = `${occurrences} tane ${letter} bulundu!`;
+                } else if (lastSpinValue && typeof lastSpinValue === 'number') {
+                    const gain = lastSpinValue * occurrences; players[currentIndex].roundScore += gain; hintEl.textContent = `${occurrences} tane ${letter} bulundu! +${gain} puan.`;
+                }
+                window.vowelBought = false; spinLocked = false; renderPlayers();
+            } else {
+                wrong(); hintEl.textContent = `${letter} bulunamadı. Sıra diğer oyuncuda.`; nextPlayer();
+            }
+            const keys = keyboardEl.querySelectorAll('.key'); keys.forEach(k => { if (k.textContent === letter) k.disabled = true; });
+            if (window.revealedPerPos.every((v, i) => v || !isLetterChar(phrase[i]))) {
+                setTimeout(() => {
+                    alert(`${players[currentIndex].name} kelimeyi tamamladı!`);
+                    endRound(true);
+                }, 200);
+            }
+        }
+
+        spinBtn.onclick = () => {
+            if (players.length === 0) { alert('Önce oyuncu ekle.'); return; }
+            if (!phrase) { alert('Önce moderatör kelime girsin.'); return; }
+            if (spinLocked) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            spinLocked = true; window.vowelBought = false; spinSound();
+            const spin = randomSpin(); setWheelRotation(spin.deg); spinBtn.disabled = true;
+            setTimeout(() => {
+                const s = sectors[spin.index]; lastSpinValue = s.value; tone(500, 0.04, 'square', 0.06);
+                spinBtn.disabled = false;
+                if (s.value === 'BANKRUPT') { bankruptSound(); players[currentIndex].roundScore = 0; hintEl.textContent = `${players[currentIndex].name} İFLAS etti! Tur puanı sıfırlandı.`; renderPlayers(); nextPlayer(); return; }
+                if (s.value === 'PASS') { tone(240, 0.08, 'sine', 0.06); hintEl.textContent = `${players[currentIndex].name} PAS geçti. Sıradaki...`; nextPlayer(); return; }
+                hintEl.textContent = `Çark: ${s.label} puan. Bir harf söyle.`;
+            }, 4100);
+        }
+
+        function nextPlayer() { currentIndex = (currentIndex + 1) % players.length; spinLocked = false; window.vowelBought = false; lastSpinValue = null; renderPlayers(); hintEl.textContent = `${players[currentIndex].name}, sıra sende! Çarkı çevir.`; }
+        nextTurnBtn.onclick = () => nextPlayer();
+        buyVowelBtn.onclick = () => { if (players.length === 0 || !phrase) return; const p = players[currentIndex]; if (p.roundScore < 200) { alert('Yeterli tur puanın yok (200 gerek).'); return; } p.roundScore -= 200; window.vowelBought = true; spinLocked = true; hintEl.textContent = 'Ünlü harf satın alındı. Bir ünlü seçebilirsin.'; renderPlayers(); }
+        guessBtn.onclick = () => { if (!phrase || players.length === 0) return; const guess = prompt('Kelime / cümle tahmini yap:'); if (!guess) return; const g = normalizePhrase(guess); if (g === phrase) { ding(); ding(); hintEl.textContent = `${players[currentIndex].name} doğru tahmin etti!`; endRound(true); } else { wrong(); hintEl.textContent = 'Yanlış tahmin. Sıra diğer oyuncuya geçti.'; nextPlayer(); } }
+
+        function endRound(solved = false) {
+            if (solved) {
+                players[currentIndex].totalScore += players[currentIndex].roundScore;
+            }
+            players.forEach(p => p.roundScore = 0);
+            for (let i = 0; i < phrase.length; i++) if (isLetterChar(phrase[i])) boardEl.children[i].textContent = phrase[i];
+            renderPlayers();
+            setTimeout(() => {
+                let winner = players.length > 0 ? players.reduce((a, b) => (a.totalScore > b.totalScore) ? a : b) : null;
+                alert(`Tur bitti! ${winner ? 'Lider: ' + winner.name + ' (' + winner.totalScore + ' puan)' : ''}`);
+                phrase = ''; masterPhraseInput.value = ''; buildEmptyBoardPlaceHolder(); hintEl.textContent = 'Yeni tur için moderatör kelime girsin.';
+                spinLocked = false;
+            }, 1500);
+        }
+        endRoundBtn.onclick = () => endRound(false);
+
+        function buildEmptyBoardPlaceHolder() { boardEl.innerHTML = '<div style="color:var(--muted);font-size:14px; letter-spacing: normal;">Yeni kelime girilince pano burada görünecek.</div>'; }
+        makeKeyboard(); buildEmptyBoardPlaceHolder(); renderPlayers();
+
+        (function renderSectorLabels() {
+            const overlay = document.getElementById('sectorOverlay'); overlay.innerHTML = '';
+            const count = sectors.length; const angle = 360 / count;
+            for (let i = 0; i < count; i++) {
+                const txt = document.createElement('div');
+                txt.className = 'sector-text';
+
+                const label = sectors[i].label;
+                const innerSpan = document.createElement('span');
+                innerSpan.textContent = label;
+                txt.appendChild(innerSpan);
+
+                const rot = i * angle + angle / 2;
+                txt.style.transform = `rotate(${rot}deg) translateY(-140px) translateX(-50%)`;
+                innerSpan.style.transform = `rotate(-${rot}deg)`;
+
+                if (label === 'İFLAS') {
+                    innerSpan.style.color = '#fff';
+                    innerSpan.style.background = '#b73737';
+                }
+                if (label === 'PAS') {
+                    innerSpan.style.background = '#444';
+                    innerSpan.style.color = '#ddd';
+                }
+                overlay.appendChild(txt);
+            }
+        })();
+    </script>
+</body>
+
+</html>
